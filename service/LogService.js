@@ -51,9 +51,7 @@ const getTodayLog = (staffId) => {
   let now = moment();
   let sod = getStartOfDay(now);
   let eod = getEndOfDay(now);
-    console.log("----------------");
-    console.log(`${now}; ${sod}; ${eod}; `)
-    console.log("----------------");
+
   let log = ResumptionExitLog.findOne({
     staffId: staffId,
     checkInTime: {
