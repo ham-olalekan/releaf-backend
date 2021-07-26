@@ -20,7 +20,7 @@ const updateStaffInfo = async (staffId, payload) => {
   let { firstName, lastName } = payload;
   const existingStaffInfo = await findStaffById(staffId);
   if (!existingStaffInfo) {
-    throw new Error(`Invalid staff Id ${staffId}`);
+    return new Promise.reject(`Invalid staff Id ${staffId}`);
   }
 
   existingStaffInfo.firstName =

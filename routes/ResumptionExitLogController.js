@@ -57,52 +57,50 @@ router.post("/check-in/:staffId", log, async (req, res) => {
   }
 
   try {
-    LogService.checkInStaff(staffId).then((log) => {
-      return res.status(200).send({
-        status: true,
-        message: "checkin successful",
-        data: log,
-      });
+    let checkinResponse = await LogService.checkInStaff(staffId);
+    return res.status(200).send({
+      status: true,
+      message: "check-in successful",
+      data: checkinResponse,
     });
   } catch (err) {
     console.log("error checking in staff  : ", err);
     return res.status(400).send({
       status: true,
-      message: "failed to checkin log",
-      data: log,
+      message: err,
+      data: null,
     });
   }
 });
 
 router.put("/check-out/:staffId", log, async (req, res) => {
-    const staffId = req.params.staffId;
-  
-    const staffInfo = await StaffService.findStaffById(staffId);
-  
-    if (!staffInfo || Object.keys(staffInfo).length == 0) {
-      return res.status(404).send({
+  const staffId = req.params.staffId;
+
+  const staffInfo = await StaffService.findStaffById(staffId);
+
+  if (!staffInfo || Object.keys(staffInfo).length == 0) {
+    return res.status(404).send({
+      status: true,
+      message: `Invalid staff Id: ${staffId}`,
+      data: null,
+    });
+  }
+
+  try {
+    let checkoutResponse = await LogService.checkOutStaff(staffId);
+      return res.status(200).send({
         status: true,
-        message: `Invalid staff Id: ${staffId}`,
-        data: null,
+        message: "checkout successful",
+        data: checkoutResponse,
       });
-    }
-  
-    try {
-      LogService.checkOutStaff(staffId).then((log) => {
-        return res.status(200).send({
-          status: true,
-          message: "checkout successful",
-          data: log,
-        });
-      });
-    } catch (err) {
-      console.log("error checkin out staff  : ", err);
-      return res.status(400).send({
-        status: true,
-        message: "failed to checkout log",
-        data: log,
-      });
-    }
-  });
+  } catch (err) {
+    console.log("error checkin out staff  : ", err);
+    return res.status(400).send({
+      status: true,
+      message: err,
+      data: null,
+    });
+  }
+});
 
 module.exports = router;

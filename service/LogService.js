@@ -2,49 +2,56 @@ const { ResumptionExitLog } = require("../model/ResumptionExitLog");
 const StaffService = require("../service/StaffService");
 const moment = require("moment");
 
-const checkInStaff = async (staffId) => {
-  let staff = StaffService.findStaffById(staffId);
+const checkInStaff = (staffId) => {
+  return new Promise(async (resolve, reject) => {
+    let staff = StaffService.findStaffById(staffId);
+    if (!staff) {
+      reject(`Invalid staffId: ${staffId}`);
+    }
 
-  if (!staff) {
-    throw new Error(`Invalid staffId: ${staffId}`);
-  }
+    let log = await getTodayLog(staffId);
 
-  let log = await getTodayLog(staffId);
+    if (log) {
+      reject("You have already clocked in today!!!");
+    }
 
-  if (log) {
-    throw new Error("You have already clocked in today!!!");
-  }
+    let isLateResumption = getResumptionTime > new Date();
 
-  let isLateResumption = getResumptionTime > new Date();
-  let dailyLog = new ResumptionExitLog({
-    staffId,
-    isLateResumption,
+    let dailyLog = new ResumptionExitLog({
+      staffId,
+      isLateResumption,
+    });
+
+    dailyLog = await dailyLog.save();
+
+    resolve(dailyLog);
   });
-
-  return dailyLog.save();
 };
 
 const checkOutStaff = async (staffId) => {
-  let checkOutTime = new Date();
+  return new Promise(async (resolve, reject) => {
+    let checkOutTime = moment();
+    let log = await getTodayLog(staffId);
 
-  let log = await getTodayLog(staffId);
-  if (!log || Object.keys(log).length == 0) {
-    throw new Error("You didn't clock in today!!! you can't clock out");
-  }
+    if (!log || Object.keys(log).length == 0) {
+      reject("You didn't clock in today!!! you can't clock out");
+    }
 
-  if (log.checkOutTime) {
-    throw new Error(
-      "You have already clocked out today!!! you can only clock out once"
-    );
-  }
+    if (log.checkOutTime) {
+      reject(
+        "You have already clocked out today!!! you can only clock out once in a day"
+      );
+    }
 
-  let isEarlyExist = getClosingTime() > checkOutTime;
+    let isEarlyExist = getClosingTime() > checkOutTime;
 
-  log.isEarlyExist = isEarlyExist;
-  log.checkOutTime = checkOutTime;
-  await ResumptionExitLog.findByIdAndUpdate(log._id, log);
+    log.isEarlyExist = isEarlyExist;
+    log.checkOutTime = checkOutTime;
 
-  return log;
+    log = await ResumptionExitLog.findByIdAndUpdate(log._id, log);
+
+    resolve(log);
+  });
 };
 
 const getTodayLog = (staffId) => {
