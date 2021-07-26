@@ -53,7 +53,7 @@ router.get("/:staffId", log, async (req, res) => {
   });
 });
 
-router.patch("/:staffId", log, async (req, res) => {
+router.post("/:staffId", log, async (req, res) => {
   const staffId = req.params.staffId;
   const payload = req.body;
   const staffInfo = await StaffService.findStaffById(staffId);
