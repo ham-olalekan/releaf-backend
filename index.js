@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-require("./startup/cors");
+require("./startup/cors")(app);
 require("./startup/db")();
 require("./startup/routes")(app);
 // require("./startup/seed")();
