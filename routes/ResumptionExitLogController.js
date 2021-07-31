@@ -73,7 +73,7 @@ router.post("/check-in/:staffId", log, async (req, res) => {
   }
 });
 
-router.patch("/check-out/:staffId", log, async (req, res) => {
+router.post("/check-out/:staffId", log, async (req, res) => {
   const staffId = req.params.staffId;
 
   const staffInfo = await StaffService.findStaffById(staffId);
