@@ -46,7 +46,7 @@ const findStaffById = async (staffId) => {
 
 const updateStaff = (staffObj) => {
   staffObj.updatedAt = new Date();
-  return Staff.updateOne(staffObj);
+  return Staff.findByIdAndUpdate(staffObj);
 };
 
 exports.createNewStaff = createNewStaff;
